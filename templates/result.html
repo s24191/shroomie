@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mushroom Prediction Result</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .mushroom-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .mushroom-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .mushroom-info {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .mushroom-info strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    {% if result.error %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> {{ result.error }}
+        </div>
+    {% else %}
+        <div class="mushroom-card">
+            <h2>{{ result.name }}</h2>
+            {% if result.image %}
+                <img src="data:image/jpeg;base64,{{ result.image }}" class="mushroom-image" alt="Mushroom Image">
+            {% else %}
+                <p>No image available</p>
+            {% endif %}
+            
+            <div class="mushroom-info">
+                <p><strong>Description:</strong> {{ result.description }}</p>
+                <p><strong>Edibility:</strong> {{ result.edibility }}</p>
+                <p><strong>Regions:</strong> {{ result.regions }}</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
