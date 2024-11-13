@@ -3,13 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mushroom Poison Prediction</title>
+    <title>Shroomie</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Upload a Mushroom Image to Predict Toxicity</h1>
-    <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*">
-        <button type="submit">Predict</button>
+    <video id="video" autoplay></video>
+    <div class="logo">Shroomie</div>
+    <h1>Upload or Capture a Mushroom Image to Predict Toxicity</h1>
+    <button class="flash-btn" onclick="toggleFlash()">
+        <img src="{{ url_for('static', filename='icons/Flash.png') }}" alt="Flash" class="icon">
+    </button>
+    <div class="btn-wrapper">
+        <button class="capture-btn" onclick="captureImage()">
+            <img src="{{ url_for('static', filename='icons/Camera.png') }}" alt="Capture" class="icon">
+        </button>
+        <form id="upload-form" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+            <label class="upload-btn">
+                <input type="file" name="file" accept="image/*" onchange="uploadImage(this)">
+                <img src="{{ url_for('static', filename='icons/Upload.png') }}" alt="Upload" class="icon">
+            </label>
+        </form>
+        <button class="settings-btn" onclick="openSettings()">
+            <img src="{{ url_for('static', filename='icons/Settings.png') }}" alt="Settings" class="icon">
+        </button>
+    </div>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <form id="capture-form" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="image" id="captured-image">
     </form>
+    <!-- Result Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettings()">&times;</span>
+            <div id="settingsContent">
+                <h2 class="settings-title">Information about developers:</h2>
+                <p class="developer-info">This is a project for SUML made by <span class="developer-name">Yan Novikau</span> and <span class="developer-name">Yehor Rafalovych</span></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const predictUrl = "{{ url_for('predict') }}";
+    </script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
