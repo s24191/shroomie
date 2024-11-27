@@ -222,7 +222,7 @@ h1 {
     max-width: 500px;
 }
 
-.settings-title {
+.settings-title, history-title {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
@@ -236,4 +236,51 @@ h1 {
 
 .developer-name {
     font-weight: 600;
+}
+
+.info-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #ebebeb;
+    color: #000000;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
+}
+
+.info-btn .icon {
+    width: 40px;
+    height: 40px;
+}
+
+#historyModal .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+}
+
+.history-image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.history-entry {
+    margin-bottom: 20px;
+}
+
+.history-details {
+    text-align: center;
+    font-size: 18px;
 }

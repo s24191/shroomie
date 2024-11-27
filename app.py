@@ -131,5 +131,39 @@ def predict():
 
     return jsonify(result)
 
+@app.route('/history', methods=['GET'])
+def history():
+    conn = get_db_connection()
+    history_entries = conn.execute('''
+        SELECT
+            History.user_image,
+            Mushroom.name AS mushroom_name,
+            History.date,
+            History.latitude,
+            History.longitude
+        FROM
+            History
+        JOIN
+            Mushroom ON History.Mushroom_id = Mushroom.id
+        ORDER BY
+            History.date DESC
+    ''').fetchall()
+    conn.close()
+
+    history_list = []
+    for entry in history_entries:
+        user_image = entry['user_image']
+        if user_image is not None:
+            user_image = base64.b64encode(user_image).decode('utf-8')
+        history_list.append({
+            'user_image': user_image,
+            'mushroom_name': entry['mushroom_name'],
+            'date': entry['date'],
+            'latitude': entry['latitude'],
+            'longitude': entry['longitude']
+        })
+
+    return jsonify(history_list)
+
 if __name__ == '__main__':
     app.run(debug=True)

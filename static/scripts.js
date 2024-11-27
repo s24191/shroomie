@@ -138,3 +138,67 @@ window.onclick = function(event) {
         resultModal.style.display = "none";
     }
 };
+
+function openHistory() {
+    fetchHistory();
+    document.getElementById('historyModal').style.display = 'block';
+}
+
+function closeHistory() {
+    document.getElementById('historyModal').style.display = 'none';
+}
+
+function fetchHistory() {
+    fetch('/history')
+        .then(response => response.json())
+        .then(data => {
+            displayHistory(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+function displayHistory(history) {
+    const historyContent = document.getElementById('historyContent');
+    historyContent.innerHTML = '';
+
+    if (history.length === 0) {
+        historyContent.innerHTML = '<p>No history available.</p>';
+        return;
+    }
+
+    // Initialize the map
+    const map = L.map('map').setView([0, 0], 2); // Centered at (0, 0) with zoom level 2
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    history.forEach(entry => {
+        const entryDiv = document.createElement('div');
+        entryDiv.classList.add('history-entry');
+
+        const image = document.createElement('img');
+        image.src = `data:image/jpeg;base64,${entry.user_image}`;
+        image.classList.add('history-image');
+
+        const details = document.createElement('div');
+        details.classList.add('history-details');
+        details.innerHTML = `
+            <p><strong>Mushroom:</strong> ${entry.mushroom_name}</p>
+            <p><strong>Date:</strong> ${entry.date}</p>
+        `;
+
+        entryDiv.appendChild(image);
+        entryDiv.appendChild(details);
+        historyContent.appendChild(entryDiv);
+
+        // Add marker to the map
+        if (entry.latitude && entry.longitude) {
+            L.marker([entry.latitude, entry.longitude])
+                .addTo(map)
+                .bindPopup(`<strong>${entry.mushroom_name}</strong><br>${entry.date}`)
+                .openPopup();
+        }
+    });
+}
