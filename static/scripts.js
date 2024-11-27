@@ -33,27 +33,22 @@ function fetchLocation() {
                 // Populate hidden fields for both forms
                 latitudeUploadInput.value = latitude;
                 longitudeUploadInput.value = longitude;
-                latitudeCaptureInput.value = latitude;
-                longitudeCaptureInput.value = longitude;
                 console.log(`Location fetched: ${latitude}, ${longitude}`);
             },
             error => {
                 console.warn("Geolocation not available. Setting coordinates to null.");
                 // Set to null if geolocation is not available
-                latitudeUploadInput.value = null;
-                longitudeUploadInput.value = null;
-                latitudeCaptureInput.value = null;
-                longitudeCaptureInput.value = null;
+                latitudeUploadInput.value = '';
+                longitudeUploadInput.value = '';
             }
         );
     } else {
         alert("Geolocation is not supported by your browser.");
-        latitudeUploadInput.value = null;
-        longitudeUploadInput.value = null;
-        latitudeCaptureInput.value = null;
-        longitudeCaptureInput.value = null;
+        latitudeUploadInput.value = '';
+        longitudeUploadInput.value = '';
     }
 }
+
 // Call fetchLocation on page load to populate GPS fields
 window.onload = fetchLocation;
 
@@ -65,19 +60,14 @@ function captureImage() {
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/jpeg');
     capturedImageInput.value = dataUrl;
-    captureForm.submit();
-}
 
-// Toggle flash
-function toggleFlash() {
-    flashEnabled = !flashEnabled;
-    // Implement flash toggle logic here
-    console.log("Flash toggled: ", flashEnabled);
-}
+    // Include latitude and longitude in the form data
+    const latitude = latitudeCaptureInput.value;
+    const longitude = longitudeCaptureInput.value;
+    const formData = new FormData(captureForm);
+    formData.append('latitude', latitude);
+    formData.append('longitude', longitude);
 
-// Upload image and display result
-function uploadImage(input) {
-    const formData = new FormData(document.getElementById('upload-form'));
     fetch(predictUrl, {
         method: 'POST',
         body: formData
@@ -91,6 +81,39 @@ function uploadImage(input) {
     });
 }
 
+
+function uploadImage(input) {
+    const formData = new FormData(document.getElementById('upload-form'));
+
+    // Ensure latitude and longitude inputs are not null
+    if (latitudeUploadInput && longitudeUploadInput) {
+        const latitude = latitudeUploadInput.value;
+        const longitude = longitudeUploadInput.value;
+        formData.append('latitude', latitude);
+        formData.append('longitude', longitude);
+    } else {
+        console.error('Latitude or Longitude input is missing.');
+    }
+
+    fetch(predictUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        displayResult(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Toggle flash
+function toggleFlash() {
+    flashEnabled = !flashEnabled;
+    // Implement flash toggle logic here
+    console.log("Flash toggled: ", flashEnabled);
+}
 // Display result in modal
 function displayResult(data) {
     if (data.error) {

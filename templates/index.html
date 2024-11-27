@@ -22,6 +22,8 @@
         </button>
         <form id="upload-form" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
             <label class="upload-btn">
+                <input type="hidden" id="latitude-upload" name="latitude">
+                <input type="hidden" id="longitude-upload" name="longitude">
                 <input type="file" name="file" accept="image/*" onchange="uploadImage(this)">
                 <img src="{{ url_for('static', filename='icons/Upload.png') }}" alt="Upload" class="icon">
             </label>
