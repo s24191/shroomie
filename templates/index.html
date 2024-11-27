@@ -24,6 +24,9 @@
                 <input type="file" name="file" accept="image/*" onchange="uploadImage(this)">
                 <img src="{{ url_for('static', filename='icons/Upload.png') }}" alt="Upload" class="icon">
             </label>
+            <!-- Hidden fields for GPS coordinates -->
+            <input type="hidden" name="latitude" id="latitude-upload">
+            <input type="hidden" name="longitude" id="longitude-upload">
         </form>
         <button class="settings-btn" onclick="openSettings()">
             <img src="{{ url_for('static', filename='icons/Settings.png') }}" alt="Settings" class="icon">
@@ -32,6 +35,9 @@
     <canvas id="canvas" style="display:none;"></canvas>
     <form id="capture-form" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="image" id="captured-image">
+         <!-- Hidden fields for GPS coordinates -->
+        <input type="hidden" name="latitude" id="latitude-capture">
+        <input type="hidden" name="longitude" id="longitude-capture">
     </form>
     <!-- Result Modal -->
     <div id="resultModal" class="modal">

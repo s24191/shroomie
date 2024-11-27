@@ -38,6 +38,13 @@ def predict():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
+    # Handle latitude and longitude gracefully
+    latitude = request.form.get('latitude')
+    longitude = request.form.get('longitude')
+    if not latitude or not longitude:
+        latitude = None  # Set to None if not provided
+        longitude = None  # Set to None if not provided
+
     # Save the uploaded file
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(file_path)
@@ -62,6 +69,7 @@ def predict():
         conn = get_db_connection()
         mushroom_info = conn.execute('''
             SELECT
+                Mushroom.id AS mushroom_id,
                 Mushroom.name AS mushroom_name,
                 Mushroom.desc AS description,
                 Mushroom.image AS image,
@@ -80,10 +88,21 @@ def predict():
             GROUP BY
                 Mushroom.id
         ''', (predicted_mushroom_name,)).fetchone()
-        conn.close()
 
-        # Check if mushroom info was found
         if mushroom_info:
+            # Convert user-uploaded image to BLOB for storage
+            with open(file_path, 'rb') as f:
+                user_image_blob = f.read()
+
+            # Save the history
+            user_id = 1  # Replace with the actual user ID (e.g., from authentication)
+            conn.execute('''
+                INSERT INTO History (User_id, Mushroom_id, user_image, date, latitude, longitude)
+                VALUES (?, ?, ?, datetime('now'), ?, ?)
+            ''', (user_id, mushroom_info['mushroom_id'], user_image_blob, latitude, longitude))
+            conn.commit()
+
+            # Prepare the response
             image_blob = mushroom_info['image']
             if image_blob is not None:
                 image_base64 = base64.b64encode(image_blob).decode('utf-8')
@@ -101,6 +120,8 @@ def predict():
             result = {'error': 'Mushroom not found in the database'}
 
     finally:
+        conn.close()
+
         # Clean up the uploaded file
         if os.path.exists(file_path):
             try:
