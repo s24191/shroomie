@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from tensorflow.python.keras.models import load_model
+from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from tensorflow.keras.applications import EfficientNetB3
 from tensorflow.keras.applications.efficientnet import preprocess_input
