@@ -1,0 +1,51 @@
+trigger:
+  - main  # Trigger the pipeline on changes to the main branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  CONTAINER_REGISTRY: $(DOCKER_REGISTRY_SERVER)
+  CONTAINER_IMAGE_NAME: 'my-app'
+  CONTAINER_TAG: 'latest'
+  RESOURCE_GROUP: 'myResourceGroup'
+  LOCATION: 'Poland Central'
+
+stages:
+  - stage: Build
+    displayName: Build Docker Image
+    jobs:
+      - job: Build
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.x'
+
+          - script: |
+              docker build -t $(CONTAINER_IMAGE_NAME):$(CONTAINER_TAG) .
+              docker tag $(CONTAINER_IMAGE_NAME):$(CONTAINER_TAG) $(CONTAINER_REGISTRY)/$(CONTAINER_IMAGE_NAME):$(CONTAINER_TAG)
+            displayName: 'Build and Tag Docker Image'
+
+          - task: Docker@2
+            displayName: Push Docker Image to ACR
+            inputs:
+              command: 'push'
+              repository: '$(CONTAINER_REGISTRY)/$(CONTAINER_IMAGE_NAME)'
+              tags: '$(CONTAINER_TAG)'
+
+  - stage: Deploy
+    displayName: Deploy Application
+    dependsOn: Build
+    jobs:
+      - job: Deploy
+        steps:
+          - task: InstallTerraform@0
+            displayName: Install Terraform
+            inputs:
+              terraformVersion: 'latest'
+
+          - script: |
+              terraform init
+              terraform apply -auto-approve
+            workingDirectory: $(System.DefaultWorkingDirectory)
+            displayName: 'Deploy Infrastructure with Terraform'

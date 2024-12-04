@@ -39,7 +39,7 @@ function fetchLocation() {
                 console.log(`Location fetched: ${latitude}, ${longitude}`);
             },
             error => {
-                console.warn("Geolocation not available. Setting coordinates to null.");
+                console.warn(`Geolocation error (${error.code}): ${error.message}`);
                 // Set to null if geolocation is not available
                 latitudeUploadInput.value = '';
                 longitudeUploadInput.value = '';
@@ -87,6 +87,14 @@ function captureImage() {
 function uploadImage(input) {
     const formData = new FormData(document.getElementById('upload-form'));
 
+    // Validate and append file from the input parameter
+    if (input.files.length > 0) {
+        formData.append('file', input.files[0]);
+    } else {
+        console.error('No file selected.');
+        return;
+    }
+
     // Ensure latitude and longitude inputs are not null
     if (latitudeUploadInput && longitudeUploadInput) {
         const latitude = latitudeUploadInput.value;
@@ -97,17 +105,18 @@ function uploadImage(input) {
         console.error('Latitude or Longitude input is missing.');
     }
 
+    // Make the POST request
     fetch(predictUrl, {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        displayResult(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            displayResult(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
 // Toggle flash
