@@ -11,17 +11,20 @@ const longitudeCaptureInput = document.getElementById('longitude-capture');
 let flashEnabled = false;
 
 // Access the device camera and stream to video element
-navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-    .then(stream => {
-        const video = document.getElementById('video');
-        if (video.srcObject !== stream) {
-            video.srcObject = stream; // Set the stream only if it's not already set
-        }
-        return video.play(); // Return the play promise
-    })
-    .catch(err => {
-        console.error("Error accessing the camera: ", err);
-    });
+if (video) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+            if (!video.srcObject) {
+                video.srcObject = stream; // Set the stream if not already set
+            }
+            return video.play();
+        })
+        .catch(err => {
+            console.error("Error accessing the camera: ", err);
+        });
+} else {
+    console.warn("Video element not found. Camera functionality will not be available.");
+}
 
 
 // Fetch user's GPS location
@@ -58,8 +61,7 @@ function captureImage() {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg');
-    capturedImageInput.value = dataUrl;
+    capturedImageInput.value = canvas.toDataURL('image/jpeg');
 
     // Include latitude and longitude in the form data
     const latitude = latitudeCaptureInput.value;
@@ -143,9 +145,9 @@ function closeSettings() {
 
 // Close modal when clicking outside of it
 window.onclick = function(event) {
-    if (event.target == resultModal) {
+    if (event.target === resultModal) {
         resultModal.style.display = 'none';
-    } else if (event.target == settingsModal) {
+    } else if (event.target === settingsModal) {
         settingsModal.style.display = 'none';
     }
 };
@@ -157,7 +159,7 @@ function closeModal() {
 
 // Close modal when clicking outside of it
 window.onclick = function(event) {
-    if (event.target == resultModal) {
+    if (event.target === resultModal) {
         resultModal.style.display = "none";
     }
 };
@@ -182,6 +184,8 @@ function fetchHistory() {
         });
 }
 
+let map; // Declare a global variable to hold the map instance
+
 function displayHistory(history) {
     const historyContent = document.getElementById('historyContent');
     historyContent.innerHTML = '';
@@ -191,8 +195,13 @@ function displayHistory(history) {
         return;
     }
 
+    // Check if the map is already initialized
+    if (map) {
+        map.remove(); // Remove the existing map instance
+    }
+
     // Initialize the map
-    const map = L.map('map').setView([0, 0], 2); // Centered at (0, 0) with zoom level 2
+    map = L.map('map').setView([0, 0], 2); // Centered at (0, 0) with zoom level 2
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);

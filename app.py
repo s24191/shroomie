@@ -16,7 +16,7 @@ model = load_model('shroomi_model.keras')
 base_model = EfficientNetB3(include_top=False, weights='imagenet', pooling='avg')
 
 # Database path
-DATABASE = 'mushroom_database.db'
+DATABASE = 'Database/mushroom_database.db'
 
 # Function to get a database connection
 def get_db_connection():
