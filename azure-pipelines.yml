@@ -16,16 +16,29 @@ stages:
     displayName: Build Docker Image
     jobs:
       - job: Build
+        displayName: Build and Push Docker Image
         steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.x'
+          # Checkout the source code
+          - task: Checkout@1
+            displayName: Checkout Source Code
 
+          # Login to ACR using Azure CLI
+          - task: AzureCLI@2
+            displayName: Login to Azure Container Registry
+            inputs:
+              azureSubscription: 'YourServiceConnectionName' # Azure DevOps Service Connection
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az acr login --name $(CONTAINER_REGISTRY)
+
+          # Build and tag Docker image
           - script: |
               docker build -t $(CONTAINER_IMAGE_NAME):$(CONTAINER_TAG) .
               docker tag $(CONTAINER_IMAGE_NAME):$(CONTAINER_TAG) $(CONTAINER_REGISTRY)/$(CONTAINER_IMAGE_NAME):$(CONTAINER_TAG)
             displayName: 'Build and Tag Docker Image'
 
+          # Push Docker image to ACR
           - task: Docker@2
             displayName: Push Docker Image to ACR
             inputs:
@@ -38,12 +51,15 @@ stages:
     dependsOn: Build
     jobs:
       - job: Deploy
+        displayName: Deploy Infrastructure with Terraform
         steps:
+          # Install Terraform
           - task: InstallTerraform@0
             displayName: Install Terraform
             inputs:
               terraformVersion: 'latest'
 
+          # Run Terraform commands
           - script: |
               terraform init
               terraform apply -auto-approve
