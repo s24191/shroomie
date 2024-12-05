@@ -54,7 +54,7 @@ stages:
         displayName: Deploy Infrastructure with Terraform
         steps:
           # Install Terraform
-          - task: InstallTerraform@0
+          - task: TerraformInstaller@1
             displayName: Install Terraform
             inputs:
               terraformVersion: 'latest'
