@@ -83,7 +83,7 @@ fabric.properties
 *$py.class
 
 # C extensions
-
+.terraform
 
 # Distribution / packaging
 .Python
@@ -243,4 +243,5 @@ cython_debug/
 ### Flask template
 instance/*
 !instance/.gitignore
+
 
