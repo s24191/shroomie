@@ -9,7 +9,6 @@ variable "docker_username" {
   default = "grandtea"
 }
 variable "docker_password" {
-  default   = "6C!eKNtanhKGtWg"
   sensitive = true
 }
 variable "github_pat" {
