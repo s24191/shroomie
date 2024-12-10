@@ -184,6 +184,16 @@ def history():
 
     return jsonify(history_list)
 
+@app.route('/user_info', methods=['GET'])
+def user_info():
+    conn = get_db_connection()
+    user_info = conn.execute('SELECT login FROM User WHERE id = ?', (1,)).fetchone()
+    conn.close()
+    if user_info:
+        return jsonify({'login': user_info['login']})
+    else:
+        return jsonify({'error': 'User not found'}), 404
+
 # Run the Flask app
 if __name__ == '__main__':
     app.run(debug=True)

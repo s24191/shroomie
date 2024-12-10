@@ -122,7 +122,7 @@ function uploadImage(input) {
 // Toggle flash
 function toggleFlash() {
     flashEnabled = !flashEnabled;
-    // Implement flash toggle logic here
+    //TODO: Implement flash toggle logic here
     console.log("Flash toggled: ", flashEnabled);
 }
 // Display result in modal
@@ -144,6 +144,20 @@ function displayResult(data) {
 
 // Open Settings modal
 function openSettings() {
+    fetch('/user_info')
+        .then(response => response.json())
+        .then(data => {
+            if (data.login) {
+                document.getElementById('user-login').textContent = data.login;
+            } else {
+                document.getElementById('user-login').textContent = 'Error fetching user login';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user info:', error);
+            document.getElementById('user-login').textContent = 'Error fetching user login';
+        });
+
     document.getElementById('settingsModal').style.display = 'block';
 }
 
