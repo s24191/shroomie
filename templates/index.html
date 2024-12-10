@@ -63,8 +63,7 @@
         <div class="modal-content">
             <span class="close" onclick="closeHistory()">&times;</span>
             <h2 class="history-title">History:</h2>
-            <div id="map" style="height: 400px;"></div> <!-- Map container -->
-
+            <input type="text" id="historySearch" class="search-bar" placeholder="Search" oninput="filterHistory()">            <div id="map" style="height: 400px;"></div> <!-- Map container -->
             <div id="historyContent"></div>
         </div>
     </div>

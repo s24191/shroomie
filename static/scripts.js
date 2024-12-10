@@ -241,7 +241,10 @@ function displayHistory(history) {
         details.classList.add('history-details');
         details.innerHTML = `
             <p><strong>Mushroom:</strong> ${entry.mushroom_name}</p>
-            <p><strong>Date:</strong> ${entry.date}</p>
+            <p><strong>Edibility:</strong> ${entry.edibility}</p>
+            <p><strong>Region:</strong> ${entry.region}</p>
+            <p><strong>Date&Time:</strong> ${entry.date}</p>
+            <p data-latitude="${entry.latitude}" data-longitude="${entry.longitude}">
         `;
 
         entryDiv.appendChild(image);
@@ -254,6 +257,37 @@ function displayHistory(history) {
                 .addTo(map)
                 .bindPopup(`<strong>${entry.mushroom_name}</strong><br>${entry.date}`)
                 .openPopup();
+        }
+    });
+}
+
+function filterHistory() {
+    const searchInput = document.getElementById('historySearch').value.toLowerCase();
+    const historyEntries = document.querySelectorAll('.history-entry');
+
+    // Clear existing markers from the map
+    map.eachLayer(layer => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+
+    historyEntries.forEach(entry => {
+        const mushroomName = entry.querySelector('.history-details p strong').nextSibling.textContent.toLowerCase();
+        if (searchInput === '' || mushroomName.includes(searchInput)) {
+            entry.style.display = '';
+
+            // Add marker to the map if the entry is visible
+            const latitude = entry.querySelector('.history-details p[data-latitude]').getAttribute('data-latitude');
+            const longitude = entry.querySelector('.history-details p[data-longitude]').getAttribute('data-longitude');
+            if (latitude && longitude) {
+                L.marker([latitude, longitude])
+                    .addTo(map)
+                    .bindPopup(`<strong>${mushroomName}</strong><br>${entry.querySelector('.history-details p[data-date]').getAttribute('data-date')}`)
+                    .openPopup();
+            }
+        } else {
+            entry.style.display = 'none';
         }
     });
 }
